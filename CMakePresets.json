@@ -1,0 +1,82 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "base-common",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_CXX_STANDARD": "17",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=lld",
+        "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=lld",
+        "CMAKE_POLICY_DEFAULT_CMP0135": "NEW",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "debug",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS_DEBUG": "-g3 -O0 -fno-omit-frame-pointer"
+      }
+    },
+    {
+      "name": "release",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS_RELEASE": "-O3 -march=native -DNDEBUG"
+      }
+    },
+    {
+      "name": "debug-cuda",
+      "inherits": ["base-common", "debug"],
+      "displayName": "Debug CUDA",
+      "cacheVariables": {
+        "CMAKE_CUDA_COMPILER": "nvcc",
+        "CMAKE_CUDA_HOST_COMPILER": "clang++",
+        "CMAKE_CUDA_ARCHITECTURES": "native",
+        "CMAKE_CUDA_FLAGS_DEBUG": "-g -G -O0"
+      }
+    },
+    {
+      "name": "release-cuda",
+      "inherits": ["base-common", "release"],
+      "displayName": "Release CUDA",
+      "cacheVariables": {
+        "CMAKE_CUDA_COMPILER": "nvcc",
+        "CMAKE_CUDA_HOST_COMPILER": "clang++",
+        "CMAKE_CUDA_ARCHITECTURES": "native",
+        "CMAKE_CUDA_FLAGS_RELEASE": "-O3 -DNDEBUG --use_fast_math"
+      }
+    },
+    {
+      "name": "debug-hip",
+      "inherits": ["base-common", "debug"],
+      "displayName": "Debug HIP",
+      "cacheVariables": {
+        "CMAKE_HIP_COMPILER": "clang++",
+        "CMAKE_HIP_ARCHITECTURES": "native",
+        "CMAKE_HIP_FLAGS_DEBUG": "-g -O0"
+      }
+    },
+    {
+      "name": "release-hip",
+      "inherits": ["base-common", "release"],
+      "displayName": "Release HIP",
+      "cacheVariables": {
+        "CMAKE_HIP_COMPILER": "clang++",
+        "CMAKE_HIP_ARCHITECTURES": "native",
+        "CMAKE_HIP_FLAGS_RELEASE": "-O3 -DNDEBUG"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "debug-cuda", "configurePreset": "debug-cuda" },
+    { "name": "release-cuda", "configurePreset": "release-cuda" },
+    { "name": "debug-hip", "configurePreset": "debug-hip" },
+    { "name": "release-hip", "configurePreset": "release-hip" }
+  ]
+}
