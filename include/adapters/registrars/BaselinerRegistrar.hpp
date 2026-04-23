@@ -1,5 +1,5 @@
 #pragma once
-#include <baseliner/core/Workload.hpp>
+#include <baseliner/registry/Registrars.hpp>
 
 namespace Adapters {
   template <class WorkloadT>

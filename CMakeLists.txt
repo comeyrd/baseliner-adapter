@@ -4,8 +4,6 @@ project(baseliner-adapters VERSION 0.1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-option(ADAPTERS_BUILD_EXAMPLES "Build adapter examples" OFF)
-
 include(CheckLanguage)
 
 check_language(CUDA)
@@ -16,7 +14,7 @@ if(CMAKE_CUDA_COMPILER)
 endif()
 
 check_language(HIP)
-if(CMAKE_HIP_COMPILER)
+if(CMAKE_HIP_COMPILER) 
     enable_language(HIP)
     set(ADAPTERS_HAS_HIP ON)
 endif()
@@ -55,7 +53,6 @@ if(ADAPTERS_HAS_HIP)
     )
     FetchContent_MakeAvailable(primbench_header)
 
-    # FetchContent puts it in the content dir, copy to our include dir
     file(COPY ${primbench_header_SOURCE_DIR}/primbench.hpp
          DESTINATION ${PRIMBENCH_INCLUDE_DIR})
 
@@ -81,6 +78,7 @@ target_link_libraries(baseliner_adapters INTERFACE baseliner::baseliner)
 
 # ── Expose cmake helpers ───────────────────────────────────────────
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/adapters.cmake)
+
 
 if(ADAPTERS_BUILD_EXAMPLES)
     add_subdirectory(examples)
