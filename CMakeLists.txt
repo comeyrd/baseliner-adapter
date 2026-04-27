@@ -73,23 +73,44 @@ if(ADAPTERS_HAS_HIP)
 endif()
 
 # ── Interface target ───────────────────────────────────────────────
-add_library(baseliner_adapters INTERFACE)
-add_library(baseliner_adapters::baseliner_adapters ALIAS baseliner_adapters)
-
-target_include_directories(baseliner_adapters INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-)
-    
-if(ADAPTERS_HAS_PRIMBENCH)
-    target_include_directories(baseliner_adapters INTERFACE
-        $<BUILD_INTERFACE:${PRIMBENCH_INCLUDE_DIR}>
+if(ADAPTERS_HAS_CUDA OR ADAPTERS_HAS_HIP)
+    add_library(baseliner_adapters_baseliner INTERFACE)
+    add_library(baseliner_adapters::baseliner ALIAS baseliner_adapters_baseliner)
+    target_include_directories(baseliner_adapters_baseliner INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
     )
+    target_compile_definitions(baseliner_adapters_baseliner INTERFACE ADAPTER_BACKEND_BASELINER)
+    target_link_libraries(baseliner_adapters_baseliner INTERFACE baseliner::baseliner)
 endif()
 
-# ── Expose cmake helpers ───────────────────────────────────────────
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/adapters.cmake)
+if(ADAPTERS_HAS_NVBENCH AND ADAPTERS_HAS_CUDA)
+    add_library(baseliner_adapters_nvbench INTERFACE)
+    add_library(baseliner_adapters::nvbench ALIAS baseliner_adapters_nvbench)
+    target_include_directories(baseliner_adapters_nvbench INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+    )
+    target_compile_definitions(baseliner_adapters_nvbench INTERFACE ADAPTER_BACKEND_NVBENCH)
+    target_link_libraries(baseliner_adapters_nvbench INTERFACE baseliner::specs nvbench::main)
+endif()
 
+if(ADAPTERS_HAS_PRIMBENCH AND ADAPTERS_HAS_HIP)
+    add_library(baseliner_adapters_primbench INTERFACE)
+    add_library(baseliner_adapters::primbench ALIAS baseliner_adapters_primbench)
+    target_include_directories(baseliner_adapters_primbench INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${PRIMBENCH_INCLUDE_DIR}>
+    )
+    target_compile_definitions(baseliner_adapters_primbench INTERFACE ADAPTER_BACKEND_PRIMBENCH)
+    target_link_libraries(baseliner_adapters_primbench INTERFACE baseliner::specs)
+    if(ADAPTERS_HAS_AMDSMI)
+        target_link_libraries(baseliner_adapters_primbench INTERFACE ADAPTER_AMD::amdsmi)
+    else()
+        target_compile_definitions(baseliner_adapters_primbench INTERFACE PRIMBENCH_NO_MONITORING)
+    endif()
+endif()
 
 if(ADAPTERS_BUILD_EXAMPLES)
     add_subdirectory(examples)
