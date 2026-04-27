@@ -29,7 +29,7 @@
 // Copyright 2026, Come Eyraud.
 #include "../ExampleWorkload.hpp"
 #include <adapters/Register.hpp>
-#include <baseliner/core/hardware/cuda/CudaBackend.hpp>
+#include <baseliner/specs/CudaBackend.hpp>
 #include <cstddef>
 #include <iostream>
 #include <memory>

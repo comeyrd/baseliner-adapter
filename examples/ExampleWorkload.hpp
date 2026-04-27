@@ -30,8 +30,10 @@
 #ifndef MATRIXMUL_KERNEL_HPP
 #define MATRIXMUL_KERNEL_HPP
 
-#include <baseliner/core/Options.hpp>
-#include <baseliner/core/hardware/cuda/CudaBackend.hpp>
+#include <baseliner/specs/Options.hpp>
+#include <baseliner/specs/Workload.hpp>
+
+#include <baseliner/specs/CudaBackend.hpp>
 #include <cstddef>
 #include <iostream>
 #include <memory>
@@ -92,6 +94,7 @@ public:
 
 protected:
   void register_options() override {
+    Baseliner::IWorkload<BackendT>::register_options();
     this->add_option("MatrixMulInput", "wA", "Width of Matrix A", m_wA_base);
     this->add_option("MatrixMulInput", "hA", "Height of Matrix A", m_hA_base);
     this->add_option("MatrixMulInput", "wB", "Width of Matrix B", m_wB_base);
@@ -100,10 +103,10 @@ protected:
   };
 
 private:
-  int m_wA_base = 256; // NOLINT
-  int m_hA_base = 256; // NOLINT
-  int m_wB_base = 256; // NOLINT
-  int m_hB_base = 256; // NOLINT
+  int m_wA_base = 1024; // NOLINT
+  int m_hA_base = 1024; // NOLINT
+  int m_wB_base = 1024; // NOLINT
+  int m_hB_base = 1024; // NOLINT
 
   int m_wA, m_hA, m_wB, m_hB;
   int m_size_A, m_size_B;

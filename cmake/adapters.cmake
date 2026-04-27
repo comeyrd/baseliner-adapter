@@ -43,6 +43,7 @@ function(adapter_add_workload)
         target_compile_definitions(${ARG_NAME}_nvbench PRIVATE ADAPTER_BACKEND_NVBENCH)
         target_link_libraries(${ARG_NAME}_nvbench PRIVATE
             baseliner_adapters::baseliner_adapters
+            baseliner::specs
             nvbench::main
             ${ARG_LIBRARIES}
         )
@@ -57,6 +58,7 @@ function(adapter_add_workload)
         target_compile_definitions(${ARG_NAME}_primbench PRIVATE ADAPTER_BACKEND_PRIMBENCH)
         target_link_libraries(${ARG_NAME}_primbench PRIVATE
             baseliner_adapters::baseliner_adapters
+            baseliner::specs
             ${ARG_LIBRARIES}
         )
     endif()

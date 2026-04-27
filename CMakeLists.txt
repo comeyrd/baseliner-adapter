@@ -67,14 +67,14 @@ target_include_directories(baseliner_adapters INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
-
+    
 if(ADAPTERS_HAS_PRIMBENCH)
     target_include_directories(baseliner_adapters INTERFACE
         $<BUILD_INTERFACE:${PRIMBENCH_INCLUDE_DIR}>
     )
 endif()
 
-target_link_libraries(baseliner_adapters INTERFACE baseliner::baseliner)
+#target_link_libraries(baseliner_adapters INTERFACE baseliner::baseliner)
 
 # ── Expose cmake helpers ───────────────────────────────────────────
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/adapters.cmake)
