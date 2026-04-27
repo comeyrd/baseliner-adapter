@@ -170,4 +170,4 @@ auto MatrixMul<Baseliner::Hardware::CudaBackend>::run_workload(std::shared_ptr<c
 }
 using MatrixMulCuda = MatrixMul<Baseliner::Hardware::CudaBackend>;
 
-ADAPTER_REGISTER_CUDA_WORKLOAD(MatrixMulCuda)
+BASELINER_REGISTER_WORKLOAD(MatrixMulCuda)

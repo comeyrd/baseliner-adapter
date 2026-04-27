@@ -171,4 +171,4 @@ auto MatrixMul<Baseliner::Hardware::HipBackend>::run_workload(std::shared_ptr<hi
 }
 using MatrixMulHip = MatrixMul<Baseliner::Hardware::HipBackend>;
 
-ADAPTER_REGISTER_HIP_WORKLOAD(MatrixMulHip)
+BASELINER_REGISTER_WORKLOAD(MatrixMulHip)
