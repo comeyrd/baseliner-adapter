@@ -33,7 +33,6 @@
 #include <baseliner/specs/Options.hpp>
 #include <baseliner/specs/Workload.hpp>
 
-#include <baseliner/specs/CudaBackend.hpp>
 #include <cstddef>
 #include <iostream>
 #include <memory>
@@ -78,15 +77,19 @@ public:
   };
   void setup(std::shared_ptr<typename BackendT::stream_t> stream) override;
 
-  void reset_workload(std::shared_ptr<cudaStream_t> stream) override;
+  void reset_workload(std::shared_ptr<typename BackendT::stream_t> stream) override;
 
-  auto run_workload(std::shared_ptr<cudaStream_t> stream) -> std::monostate override;
+  auto run_workload(std::shared_ptr<typename BackendT::stream_t> stream) -> std::monostate override;
 
-  void teardown(std::shared_ptr<cudaStream_t> stream) override;
+  void teardown(std::shared_ptr<typename BackendT::stream_t> stream) override;
 
   auto number_of_floating_point_operations() -> std::optional<size_t> override {
     size_t flops = 2ULL * m_hA * m_wA * m_wB;
     return flops;
+  }
+  auto number_of_bytes() -> std::optional<size_t> override {
+    size_t bytes = sizeof(float) * (m_size_A + m_size_B + m_size_C);
+    return bytes;
   }
   auto validate_workload() -> bool override {
     return true;

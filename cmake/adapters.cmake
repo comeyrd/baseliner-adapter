@@ -61,6 +61,11 @@ function(adapter_add_workload)
             baseliner::specs
             ${ARG_LIBRARIES}
         )
+        if(ADAPTERS_HAS_AMDSMI)
+            target_link_libraries(${ARG_NAME}_primbench PRIVATE ADAPTER_AMD::amdsmi)
+        else()
+            target_compile_definitions(${ARG_NAME}_primbench PRIVATE PRIMBENCH_NO_MONITORING)
+        endif()
     endif()
 
 endfunction()

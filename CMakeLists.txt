@@ -17,6 +17,19 @@ check_language(HIP)
 if(CMAKE_HIP_COMPILER) 
     enable_language(HIP)
     set(ADAPTERS_HAS_HIP ON)
+    set(ROCM_PATH "/opt/rocm" CACHE PATH "Path to ROCm installation")
+    find_path(AMDSMI_INCLUDE_DIR NAMES amd_smi/amdsmi.h PATHS ${ROCM_PATH}/include)
+    find_library(AMDSMI_LIBRARY NAMES amd_smi PATHS ${ROCM_PATH}/lib)
+
+    if(AMDSMI_INCLUDE_DIR AND AMDSMI_LIBRARY)
+        message(STATUS "Found AMD SMI: ${AMDSMI_LIBRARY}")  
+        set(BASELINER_HAS_AMDSMI ON)
+        add_library(ADAPTER_AMD::amdsmi UNKNOWN IMPORTED)
+        set_target_properties(ADAPTER_AMD::amdsmi PROPERTIES
+            INTERFACE_INCLUDE_DIRECTORIES "${AMDSMI_INCLUDE_DIR}"
+            IMPORTED_LOCATION "${AMDSMI_LIBRARY}"
+        )
+    endif()
 endif()
 
 include(FetchContent)
@@ -73,8 +86,6 @@ if(ADAPTERS_HAS_PRIMBENCH)
         $<BUILD_INTERFACE:${PRIMBENCH_INCLUDE_DIR}>
     )
 endif()
-
-#target_link_libraries(baseliner_adapters INTERFACE baseliner::baseliner)
 
 # ── Expose cmake helpers ───────────────────────────────────────────
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/adapters.cmake)
