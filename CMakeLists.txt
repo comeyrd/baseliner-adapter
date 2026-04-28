@@ -97,16 +97,12 @@ if(ADAPTERS_HAS_NVBENCH AND ADAPTERS_HAS_CUDA)
     )
 endif()
 
-# ── baseliner_adapters::primbench (HIP) ───────────────────────────
 if(ADAPTERS_HAS_PRIMBENCH AND ADAPTERS_HAS_HIP)
-    # PrimBenchAdapter.cpp contains main() and the WorkloadBridge — it is
-    # compiled as an OBJECT library so downstream executables can link it
-    # without needing to know about primbench.hpp themselves.
     add_library(baseliner_adapters_primbench_obj OBJECT
-        src/primbench/PrimBenchAdapter.cpp
+        src/primbench/PrimBenchAdapter.hip
     )
     target_include_directories(baseliner_adapters_primbench_obj
-        BEFORE PRIVATE                                          # shadow wins
+        BEFORE PRIVATE                                        
             ${CMAKE_CURRENT_SOURCE_DIR}/shadow
     )
     target_include_directories(baseliner_adapters_primbench_obj

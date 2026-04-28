@@ -29,8 +29,8 @@
 
 // Copyright 2026, Come Eyraud.
 #include "../ExampleWorkload.hpp"
-#include <adapters/Register.hpp>
-#include <baseliner/core/HipBackend.hpp>
+#include <baseliner/Register.hpp>
+#include <baseliner/core/hardware/hip/HipBackend.hpp>
 #include <cstddef>
 #include <iostream>
 #include <memory>

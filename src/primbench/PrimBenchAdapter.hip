@@ -1,4 +1,4 @@
-#include <adapters/PrimBenchStorage.hpp>
+#include <adapters/PrimBenchRegister.hpp>
 #include <primbench.hpp>
 
 #include <memory>
@@ -34,17 +34,11 @@ namespace {
 
       auto bytes = m_workload->number_of_bytes();
       if (bytes.has_value()) {
-        state.add_reads<uint8_t>(bytes.value());
         state.add_writes<uint8_t>(bytes.value());
       }
 
-      // primbench calls this lambda repeatedly.
-      // reset_workload is called before every kernel invocation so each
-      // call starts from a clean, deterministic state.
-      state.run([&]() {
-        m_workload->reset_workload(stream);
-        m_workload->run_workload(stream);
-      });
+      state.run_before_every_iteration([&]() { m_workload->reset_workload(stream); });
+      state.run([&]() { m_workload->run_workload(stream); });
 
       m_workload->teardown(stream);
     }
@@ -59,7 +53,7 @@ int main(int argc, char *argv[]) {
   primbench::executor exec(argc, argv);
 
   for (auto &workload : Adapters::PrimBenchStorage::instance().take_workloads()) {
-    exec.queue(std::make_unique<WorkloadBridge>(std::move(workload)));
+    exec.queue<WorkloadBridge>(std::move(workload));
   }
 
   exec.run();
