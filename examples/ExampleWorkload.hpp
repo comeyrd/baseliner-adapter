@@ -56,8 +56,8 @@ inline void generate_random(int seed, std::vector<float> &m_h_A, std::vector<flo
 template <typename BackendT>
 class MatrixMul : public Baseliner::IWorkload<BackendT> {
 public:
-  auto name() -> std::string override {
-    return "MatrixMulKernel";
+  auto algo() -> std::string override {
+    return "MatrixMul";
   };
   void alloc_host() {
     m_wA = m_wA_base;

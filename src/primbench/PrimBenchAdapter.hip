@@ -12,7 +12,7 @@ namespace {
     }
 
     primbench::json meta() const override {
-      return primbench::json{}.add("algo", m_workload->name());
+      return primbench::json{}.add("algo", m_workload->algo()).add("name", m_workload->specialization());
     }
 
     void run(primbench::state &state) override {
