@@ -30,8 +30,8 @@
 #ifndef MATRIXMUL_KERNEL_HPP
 #define MATRIXMUL_KERNEL_HPP
 
-#include <baseliner/specs/Options.hpp>
-#include <baseliner/specs/Workload.hpp>
+#include <baseliner/core/Options.hpp>
+#include <baseliner/core/Workload.hpp>
 
 #include <cstddef>
 #include <iostream>

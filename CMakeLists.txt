@@ -92,7 +92,7 @@ if(ADAPTERS_HAS_NVBENCH AND ADAPTERS_HAS_CUDA)
         $<INSTALL_INTERFACE:include>
     )
     target_compile_definitions(baseliner_adapters_nvbench INTERFACE ADAPTER_BACKEND_NVBENCH)
-    target_link_libraries(baseliner_adapters_nvbench INTERFACE baseliner::specs nvbench::main)
+    target_link_libraries(baseliner_adapters_nvbench INTERFACE baseliner::core nvbench::main)
 endif()
 
 if(ADAPTERS_HAS_PRIMBENCH AND ADAPTERS_HAS_HIP)
@@ -104,7 +104,7 @@ if(ADAPTERS_HAS_PRIMBENCH AND ADAPTERS_HAS_HIP)
         $<BUILD_INTERFACE:${PRIMBENCH_INCLUDE_DIR}>
     )
     target_compile_definitions(baseliner_adapters_primbench INTERFACE ADAPTER_BACKEND_PRIMBENCH)
-    target_link_libraries(baseliner_adapters_primbench INTERFACE baseliner::specs)
+    target_link_libraries(baseliner_adapters_primbench INTERFACE baseliner::core)
     if(ADAPTERS_HAS_AMDSMI)
         target_link_libraries(baseliner_adapters_primbench INTERFACE ADAPTER_AMD::amdsmi)
     else()
