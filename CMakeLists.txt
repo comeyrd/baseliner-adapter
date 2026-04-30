@@ -114,52 +114,25 @@ if(ADAPTERS_HAS_NVBENCH AND ADAPTERS_HAS_CUDA)
 endif()
 
 if(ADAPTERS_HAS_PRIMBENCH AND ADAPTERS_HAS_HIP)
-    add_library(baseliner_adapters_primbench_obj OBJECT
+    add_library(baseliner_adapters_primbench STATIC
         src/primbench/PrimBenchAdapter.hip
     )
-    target_include_directories(baseliner_adapters_primbench_obj
-        BEFORE PRIVATE                                        
-            ${CMAKE_CURRENT_SOURCE_DIR}/shadow
-    )
-    target_include_directories(baseliner_adapters_primbench_obj
-        PRIVATE
-            ${CMAKE_CURRENT_SOURCE_DIR}/include
-            ${PRIMBENCH_INCLUDE_DIR}
-    )
-    target_compile_definitions(baseliner_adapters_primbench_obj PRIVATE ADAPTER_BACKEND_PRIMBENCH)
-    target_link_libraries(baseliner_adapters_primbench_obj PRIVATE baseliner::core)
-    if(BASELINER_HAS_AMDSMI)
-        target_link_libraries(baseliner_adapters_primbench_obj PRIVATE ADAPTER_AMD::amdsmi)
-    else()
-        target_compile_definitions(baseliner_adapters_primbench_obj PRIVATE PRIMBENCH_NO_MONITORING)
-    endif()
-
-    # The INTERFACE target that user benchmarks link against.
-    # It brings in the OBJECT (which owns main) + shadow + include paths.
-    add_library(baseliner_adapters_primbench INTERFACE)
     add_library(baseliner_adapters::primbench ALIAS baseliner_adapters_primbench)
 
     target_include_directories(baseliner_adapters_primbench
-        BEFORE INTERFACE
+        BEFORE PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/shadow>
-            $<INSTALL_INTERFACE:shadow>
-    )
-    target_include_directories(baseliner_adapters_primbench
-        INTERFACE
+        PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            $<INSTALL_INTERFACE:include>
             $<BUILD_INTERFACE:${PRIMBENCH_INCLUDE_DIR}>
     )
+    target_compile_definitions(baseliner_adapters_primbench PUBLIC ADAPTER_BACKEND_PRIMBENCH)
+    target_link_libraries(baseliner_adapters_primbench PUBLIC baseliner::core)
 
-    target_compile_definitions(baseliner_adapters_primbench INTERFACE ADAPTER_BACKEND_PRIMBENCH)
-    target_link_libraries(baseliner_adapters_primbench INTERFACE
-        baseliner::core
-        $<TARGET_OBJECTS:baseliner_adapters_primbench_obj>
-    )
     if(BASELINER_HAS_AMDSMI)
-        target_link_libraries(baseliner_adapters_primbench INTERFACE ADAPTER_AMD::amdsmi)
+        target_link_libraries(baseliner_adapters_primbench PUBLIC ADAPTER_AMD::amdsmi)
     else()
-        target_compile_definitions(baseliner_adapters_primbench INTERFACE PRIMBENCH_NO_MONITORING)
+        target_compile_definitions(baseliner_adapters_primbench PUBLIC PRIMBENCH_NO_MONITORING)
     endif()
 endif()
 
