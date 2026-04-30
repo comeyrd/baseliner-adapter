@@ -74,39 +74,19 @@ if(ADAPTERS_HAS_CUDA OR ADAPTERS_HAS_HIP)
     target_link_libraries(baseliner_adapters_baseliner INTERFACE baseliner::baseliner)
 
 ##MINIMAL
-add_library(baseliner_adapters_minimal_obj OBJECT
-        src/minimal/MinimalAdapter.cpp
-    )
-    target_include_directories(baseliner_adapters_minimal_obj
-        BEFORE PRIVATE                                        
-            ${CMAKE_CURRENT_SOURCE_DIR}/shadow
-    )
-    target_include_directories(baseliner_adapters_minimal_obj
-        PRIVATE
-            ${CMAKE_CURRENT_SOURCE_DIR}/include)
-    target_compile_definitions(baseliner_adapters_minimal_obj PRIVATE ADAPTER_BACKEND_MINIMAL)
-    target_link_libraries(baseliner_adapters_minimal_obj PUBLIC baseliner::core)
+add_library(baseliner_adapters_minimal STATIC
+    src/minimal/MinimalAdapter.cpp
+)
+add_library(baseliner_adapters::minimal ALIAS baseliner_adapters_minimal)
 
-    add_library(baseliner_adapters_minimal INTERFACE)
-    add_library(baseliner_adapters::minimal ALIAS baseliner_adapters_minimal)
-
-    target_include_directories(baseliner_adapters_minimal
-        BEFORE INTERFACE
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/shadow>
-            $<INSTALL_INTERFACE:shadow>
-    )
-    target_include_directories(baseliner_adapters_minimal
-        INTERFACE
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            $<INSTALL_INTERFACE:include>
-    )
-
-    target_compile_definitions(baseliner_adapters_minimal INTERFACE ADAPTER_BACKEND_MINIMAL)
-    target_link_libraries(baseliner_adapters_minimal INTERFACE
-        baseliner::core
-        $<TARGET_OBJECTS:baseliner_adapters_minimal_obj>
-    )
-
+target_include_directories(baseliner_adapters_minimal
+    BEFORE PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/shadow>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+target_compile_definitions(baseliner_adapters_minimal PUBLIC ADAPTER_BACKEND_MINIMAL)
+target_link_libraries(baseliner_adapters_minimal PUBLIC baseliner::core)
 endif()
 
 # ── baseliner_adapters::nvbench (CUDA) ────────────────────────────
