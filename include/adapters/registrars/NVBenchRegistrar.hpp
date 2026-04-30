@@ -13,14 +13,14 @@ namespace Adapters {
 
       workload.setup_host();
 
-      workload.setup_device(state.get_stream());
+      workload.setup_device(state.get_cuda_stream());
 
       state.exec(nvbench::exec_tag::sync, [&](nvbench::launch &launch) {
         workload.reset_device(launch.get_stream());
         workload.run(launch.get_stream());
       });
 
-      workload.fetch_results(state.get_stream());
+      workload.fetch_results(state.get_cuda_stream());
       workload.free();
     }
   };
