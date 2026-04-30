@@ -21,7 +21,8 @@ namespace {
       auto stream = std::shared_ptr<hipStream_t>(&const_cast<hipStream_t &>(state.stream),
                                                  [](hipStream_t *) { /* no-op: primbench owns the stream */ });
 
-      m_workload->setup(stream);
+      m_workload->setup_host();
+      m_workload->setup_device(stream);
 
       // Tell primbench how many items/bytes this workload processes
       // so it can compute items/sec and bytes/sec.
@@ -37,10 +38,11 @@ namespace {
         state.add_writes<uint8_t>(bytes.value());
       }
 
-      state.run_before_every_iteration([&]() { m_workload->reset_workload(stream); });
-      state.run([&]() { m_workload->run_workload(stream); });
+      state.run_before_every_iteration([&]() { m_workload->reset_device(stream); });
+      state.run([&]() { m_workload->run(stream); });
 
-      m_workload->teardown(stream);
+      m_workload->fetch_results(stream);
+      m_workload->free();
     }
 
   private:
