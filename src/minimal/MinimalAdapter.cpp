@@ -52,14 +52,20 @@ int main(int argc, char *argv[]) {
     }
   }
   for (const auto &bridge : workloads) {
-    if (bridge) {
-      if (timed) {
-        auto results = bridge->timed_run(repetitions);
-        dump_stats(bridge->name(), results);
-      } else {
-        bridge->run(repetitions);
-        std::cout << bridge->name() << "\n";
+    try {
+      if (bridge) {
+        if (timed) {
+          auto results = bridge->timed_run(repetitions);
+          dump_stats(bridge->name(), results);
+        } else {
+          bridge->run(repetitions);
+          std::cout << bridge->name() << "\n";
+        }
       }
+    } catch (std::exception &e) {
+      std::cout << e.what() << "\n";
+    } catch (...) {
+      std::cout << "Caught unknown error\n";
     }
   }
 
