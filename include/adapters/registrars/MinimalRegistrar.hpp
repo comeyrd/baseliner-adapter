@@ -10,8 +10,10 @@ namespace Adapters {
 
   class IWorkloadBridge {
   public:
-    virtual ~IWorkloadBridge() = default; // Essential for safe polymorphic destruction
-    virtual void run() = 0;               // Type-erased execution
+    virtual ~IWorkloadBridge() = default;   // Essential for safe polymorphic destruction
+    virtual void run(uint repetitions) = 0; // Type-erased execution
+    virtual auto timed_run(uint repetitions) -> std::vector<Baseliner::float_milliseconds> = 0; // Type-erased execution
+    virtual auto name() -> std::string = 0;
   };
 
   template <typename BackendT>
@@ -22,18 +24,37 @@ namespace Adapters {
     explicit WorkloadBridge(WorkloadFactory<BackendT> workload)
         : m_workload(workload()) {
     }
+    auto name() -> std::string override {
+      return m_workload->algo() + m_workload->specialization();
+    }
 
-    // Override the run method
-    void run() override {
+    void run(uint repetitions) override {
       auto stream = BackendT::instance()->create_stream();
       m_workload->setup_host();
       m_workload->setup_device(*stream);
-      for (int j = 0; j < 50; j++) {
+      for (int j = 0; j < repetitions; j++) {
         m_workload->reset_device(*stream);
         m_workload->run(*stream);
       }
       m_workload->fetch_results(*stream);
       m_workload->free();
+    }
+
+    auto timed_run(uint repetitions) -> std::vector<Baseliner::float_milliseconds> override {
+      auto stream = BackendT::instance()->create_stream();
+      m_workload->set_timer(std::make_shared<Baseliner::Hardware::GpuTimer<BackendT>>());
+      m_workload->setup_host();
+      m_workload->setup_device(*stream);
+
+      m_workload->init_batch(*stream, repetitions, false);
+      for (int j = 0; j < repetitions; j++) {
+        m_workload->reset_device(*stream);
+        m_workload->timed_batch_run(*stream);
+      }
+      auto exec_time = m_workload->timed_run_elapsed_batch();
+      m_workload->fetch_results(*stream);
+      m_workload->free();
+      return exec_time;
     }
 
   private:
