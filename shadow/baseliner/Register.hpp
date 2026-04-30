@@ -31,8 +31,6 @@
 #include <adapters/MinimalRegister.hpp>
 
 #define BASELINER_REGISTER_WORKLOAD(Workload) MINIMAL_REGISTER_WORKLOAD(Workload)
-
-#define BASELINER_REGISTER_WORKLOAD_NAME(Workload, name) MINIMAL_REGISTER_WORKLOAD_NAME(Workload, name)
 #endif
 
 #endif // BASELINER_REGISTRY_REGISTERINGMACROS_HPP

@@ -47,7 +47,7 @@ if(ADAPTERS_HAS_CUDA)
     FetchContent_Declare(
         nvbench
         GIT_REPOSITORY https://github.com/NVIDIA/nvbench.git
-        GIT_TAG        main
+        GIT_TAG        a3364ca5c787da0bd6ef83683e3d42c8d730d579
     )
     FetchContent_MakeAvailable(nvbench)
     set(ADAPTERS_HAS_NVBENCH ON)
@@ -58,7 +58,7 @@ if(ADAPTERS_HAS_HIP)
     file(MAKE_DIRECTORY ${PRIMBENCH_INCLUDE_DIR})
     FetchContent_Declare(
         primbench_header
-        URL            https://raw.githubusercontent.com/ROCm/rocm-libraries/refs/heads/develop/shared/primbench/primbench.hpp
+        URL            https://raw.githubusercontent.com/ROCm/rocm-libraries/dd6042eab069d7e6c4e777011397237a4fa1a81b/shared/primbench/primbench.hpp
         DOWNLOAD_NO_EXTRACT TRUE
     )
     FetchContent_MakeAvailable(primbench_header)

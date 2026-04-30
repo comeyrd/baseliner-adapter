@@ -52,7 +52,7 @@
         "CMAKE_CUDA_COMPILER": "nvcc",
         "CMAKE_CUDA_HOST_COMPILER": "clang++",
         "CMAKE_CUDA_ARCHITECTURES": "native",
-        "CMAKE_CUDA_FLAGS_RELEASE": "-O3 -DNDEBUG --use_fast_math"
+        "CMAKE_CUDA_FLAGS_RELEASE": "-O3 -DNDEBUG --use_fast_math -Wno-deprecated-gpu-targets"
       }
     },
     {
