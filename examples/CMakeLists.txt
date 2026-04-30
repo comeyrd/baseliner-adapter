@@ -6,6 +6,11 @@ add_executable(matmul_baseliner)
 target_link_libraries(matmul_baseliner PUBLIC matmul baseliner_adapters::baseliner)
 target_include_directories(matmul_baseliner PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
+add_executable(matmul_minimal)
+target_link_libraries(matmul_minimal PUBLIC matmul baseliner_adapters::minimal)
+target_include_directories(matmul_minimal PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
+
+
 if(ADAPTERS_HAS_CUDA)
     add_executable(matmul_nvbench)
     target_link_libraries(matmul_nvbench PUBLIC matmul baseliner_adapters::nvbench)
