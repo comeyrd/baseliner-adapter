@@ -93,8 +93,9 @@ if(ADAPTERS_HAS_NVBENCH AND ADAPTERS_HAS_CUDA)
     target_compile_definitions(baseliner_adapters_nvbench INTERFACE ADAPTER_BACKEND_NVBENCH)
     target_link_libraries(baseliner_adapters_nvbench INTERFACE
         baseliner::core
-        nvbench::main
+        nvbench::nvbench
     )
+    target_sources(baseliner_adapters_nvbench INTERFACE $<TARGET_OBJECTS:nvbench::main>)
 endif()
 
 if(ADAPTERS_HAS_PRIMBENCH AND ADAPTERS_HAS_HIP)

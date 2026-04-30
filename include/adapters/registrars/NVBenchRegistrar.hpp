@@ -22,17 +22,20 @@ namespace Adapters {
       cudaStream_t raw = state.get_cuda_stream();
       auto stream = make_baseliner_stream(raw);
 
-      workload.setup(stream);
+      workload.setup_host();
+
+      workload.setup_device(stream);
 
       state.exec(nvbench::exec_tag::sync, [&](nvbench::launch &launch) {
         cudaStream_t iter_raw = launch.get_stream();
         auto iter_stream = make_baseliner_stream(iter_raw);
 
-        workload.reset_workload(iter_stream);
-        workload.run_workload(iter_stream);
+        workload.reset_device(iter_stream);
+        workload.run(iter_stream);
       });
 
-      workload.teardown(stream);
+      workload.fetch_results(stream);
+      workload.free();
     }
   };
 
