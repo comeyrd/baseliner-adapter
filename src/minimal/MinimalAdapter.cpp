@@ -67,6 +67,11 @@ int main(int argc, char *argv[]) {
     } catch (...) {
     }
   }
+  std::cout << "Setup : " << repetitions << " repetitions | " << work_size << " work size | ";
+  if (!timed) {
+    std::cout << "not ";
+  }
+  std::cout << "timed\n";
   for (const auto &bridge : workloads) {
     try {
       if (bridge) {
