@@ -16,16 +16,9 @@ namespace {
     }
 
     void run(primbench::state &state) override {
-      // primbench owns the stream; wrap it as a non-owning shared_ptr
-      // so Baseliner's interface is satisfied without a double-free.
-      auto stream = std::shared_ptr<hipStream_t>(&const_cast<hipStream_t &>(state.stream),
-                                                 [](hipStream_t *) { /* no-op: primbench owns the stream */ });
 
       m_workload->setup_host();
-      m_workload->setup_device(stream);
-
-      // Tell primbench how many items/bytes this workload processes
-      // so it can compute items/sec and bytes/sec.
+      m_workload->setup_device(state.stream);
       auto flops = m_workload->number_of_floating_point_operations();
       if (flops.has_value() && flops.value() > 0) {
         state.set_items(flops.value());
@@ -38,10 +31,10 @@ namespace {
         state.add_writes<uint8_t>(bytes.value());
       }
 
-      state.run_before_every_iteration([&]() { m_workload->reset_device(stream); });
-      state.run([&]() { m_workload->run(stream); });
+      state.run_before_every_iteration([&]() { m_workload->reset_device(state.stream); });
+      state.run([&]() { m_workload->run(state.stream); });
 
-      m_workload->fetch_results(stream);
+      m_workload->fetch_results(state.stream);
       m_workload->free();
     }
 
