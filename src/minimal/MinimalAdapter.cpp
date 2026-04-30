@@ -40,8 +40,15 @@ void dump_stats(const std::string &name, std::vector<Baseliner::float_millisecon
 
 int main(int argc, char *argv[]) {
   const auto &workloads = Adapters::GlobalWorkloadStorage::instance().get_workloads();
-  bool timed = argc > 2;
+  if (argc > 1) {
+    if (std::string(argv[1]) == "-h") {
+      std::cout << "Usage : " << argv[0] << " [nb_repetitions = 50] [work_size = 10] timed\n";
+      return 0;
+    }
+  }
+  bool timed = argc > 3;
   uint repetitions = 50;
+  int work_size = 10;
   if (argc > 1) {
     try {
       int parsed = std::stoi(argv[1]);
@@ -51,14 +58,23 @@ int main(int argc, char *argv[]) {
     } catch (...) {
     }
   }
+  if (argc > 2) {
+    try {
+      int parsed = std::stoi(argv[2]);
+      if (parsed > 0) {
+        work_size = std::min(static_cast<int>(parsed), 2000);
+      }
+    } catch (...) {
+    }
+  }
   for (const auto &bridge : workloads) {
     try {
       if (bridge) {
         if (timed) {
-          auto results = bridge->timed_run(repetitions);
+          auto results = bridge->timed_run(work_size, repetitions);
           dump_stats(bridge->name(), results);
         } else {
-          bridge->run(repetitions);
+          bridge->run(work_size, repetitions);
           std::cout << bridge->name() << "\n";
         }
       }

@@ -8,11 +8,18 @@
 
 namespace Adapters {
 
+  inline auto work_size_omap(int work_size) -> Baseliner::OptionsMap {
+    std::string str_wz = std::to_string(work_size);
+    auto option = Baseliner::Option{{}, str_wz};
+    Baseliner::OptionsMap omap = {{"Workload", {{"work_size", option}}}};
+    return omap;
+  } // namespace Adapters
   class IWorkloadBridge {
   public:
-    virtual ~IWorkloadBridge() = default;   // Essential for safe polymorphic destruction
-    virtual void run(uint repetitions) = 0; // Type-erased execution
-    virtual auto timed_run(uint repetitions) -> std::vector<Baseliner::float_milliseconds> = 0; // Type-erased execution
+    virtual ~IWorkloadBridge() = default;                  // Essential for safe polymorphic destruction
+    virtual void run(int work_size, uint repetitions) = 0; // Type-erased execution
+    virtual auto timed_run(int work_size, uint repetitions)
+        -> std::vector<Baseliner::float_milliseconds> = 0; // Type-erased execution
     virtual auto name() -> std::string = 0;
   };
 
@@ -28,11 +35,12 @@ namespace Adapters {
       return m_workload->algo() + m_workload->specialization();
     }
 
-    void run(uint repetitions) override {
+    void run(int work_size, uint repetitions) override {
       auto stream = BackendT::instance()->create_stream();
+      m_workload->apply_options(work_size_omap(work_size));
       m_workload->setup_host();
       m_workload->setup_device(*stream);
-      for (int j = 0; j < repetitions; j++) {
+      for (uint j = 0; j < repetitions; j++) {
         m_workload->reset_device(*stream);
         m_workload->run(*stream);
       }
@@ -40,14 +48,15 @@ namespace Adapters {
       m_workload->free();
     }
 
-    auto timed_run(uint repetitions) -> std::vector<Baseliner::float_milliseconds> override {
+    auto timed_run(int work_size, uint repetitions) -> std::vector<Baseliner::float_milliseconds> override {
+      m_workload->apply_options(work_size_omap(work_size));
       auto stream = BackendT::instance()->create_stream();
       m_workload->set_timer(std::make_shared<Baseliner::Hardware::GpuTimer<BackendT>>());
       m_workload->setup_host();
       m_workload->setup_device(*stream);
 
       m_workload->init_batch(*stream, repetitions, false);
-      for (int j = 0; j < repetitions; j++) {
+      for (uint j = 0; j < repetitions; j++) {
         m_workload->reset_device(*stream);
         m_workload->timed_batch_run(*stream);
       }
