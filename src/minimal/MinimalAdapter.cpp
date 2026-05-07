@@ -151,7 +151,6 @@ auto main(int argc, char *argv[]) -> int {
       print_stats(bridge->name(), stats);
 
       if (json_out.is_open()) {
-        std::cout << "saving to : " << json_path << "\n";
         if (!is_first_entry) {
           json_out << ",\n";
         }
@@ -164,6 +163,7 @@ auto main(int argc, char *argv[]) -> int {
   }
 
   if (json_out.is_open()) {
+    std::cout << "saving to : " << json_path << "\n";
     json_out << "\n]\n";
   }
   return EXIT_SUCCESS;
