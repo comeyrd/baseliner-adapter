@@ -16,9 +16,9 @@ namespace Adapters {
   } // namespace Adapters
   class IWorkloadBridge {
   public:
-    virtual ~IWorkloadBridge() = default;                  // Essential for safe polymorphic destruction
-    virtual void run(int work_size, uint repetitions) = 0; // Type-erased execution
-    virtual auto timed_run(int work_size, uint repetitions)
+    virtual ~IWorkloadBridge() = default;                              // Essential for safe polymorphic destruction
+    virtual void run(int work_size, uint repetitions, int device) = 0; // Type-erased execution
+    virtual auto timed_run(int work_size, uint repetitions, int device)
         -> std::vector<Baseliner::float_milliseconds> = 0; // Type-erased execution
     virtual auto name() -> std::string = 0;
   };
@@ -35,7 +35,8 @@ namespace Adapters {
       return m_workload->algo() + m_workload->specialization();
     }
 
-    void run(int work_size, uint repetitions) override {
+    void run(int work_size, uint repetitions, int device) override {
+      BackendT::instance()->update_device(device);
       auto stream = BackendT::instance()->create_stream();
       m_workload->apply_options(work_size_omap(work_size));
       m_workload->setup_host();
@@ -48,7 +49,8 @@ namespace Adapters {
       m_workload->free();
     }
 
-    auto timed_run(int work_size, uint repetitions) -> std::vector<Baseliner::float_milliseconds> override {
+    auto timed_run(int work_size, uint repetitions, int device) -> std::vector<Baseliner::float_milliseconds> override {
+      BackendT::instance()->update_device(device);
       m_workload->apply_options(work_size_omap(work_size));
       auto stream = BackendT::instance()->create_stream();
       m_workload->set_timer(std::make_shared<Baseliner::Hardware::GpuTimer<BackendT>>());
