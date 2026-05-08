@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
   std::vector<int> work_sizes = {1, 2, 4, 8, 16, 32, 64, 128, 256};
   for (auto &workload : Adapters::PrimBenchStorage::instance().take_workloads()) {
     for (const auto work : work_sizes) {
-      exec.queue<WorkloadBridge>(std::move(workload), work);
+      exec.queue<WorkloadBridge>(std::move(workload()), work);
     }
   }
 

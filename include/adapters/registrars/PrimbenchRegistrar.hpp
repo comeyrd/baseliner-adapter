@@ -23,13 +23,9 @@ namespace Adapters {
       m_factories.push_back(std::move(factory));
     }
 
-    auto take_workloads() -> std::vector<std::unique_ptr<HipWorkload>> {
+    auto take_workloads() -> std::vector<HipWorkloadFactory> {
       std::vector<std::unique_ptr<HipWorkload>> workloads;
-      workloads.reserve(m_factories.size());
-      for (auto &factory : m_factories) {
-        workloads.push_back(factory());
-      }
-      return workloads;
+      return m_factories;
     }
 
   private:
