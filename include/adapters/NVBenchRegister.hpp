@@ -12,7 +12,9 @@
   static void _##W##_nvbench_fn(nvbench::state &state) {                                                               \
     Adapters::NvbenchRegistrar<W>::run(state);                                                                         \
   }                                                                                                                    \
-  NVBENCH_BENCH(_##W##_nvbench_fn).set_name(Adapters::nv_bench_benchmark_name<W>());
+  NVBENCH_BENCH(_##W##_nvbench_fn)                                                                                     \
+      .set_name(Adapters::nv_bench_benchmark_name<W>())                                                                \
+      .add_int64_power_of_two_axis("work_size", nvbench::range(0, 8));
 
 #define NVBENCH_REGISTER_WORKLOAD(Workload) NVBENCH_REGISTER_WORKLOAD_IMPL(Workload)
 

@@ -15,7 +15,10 @@ namespace Adapters {
   class NvbenchRegistrar {
   public:
     static void run(nvbench::state &state) {
+
       WorkloadT workload;
+      int size = static_cast<int>(state.get_int64("work_size"));
+      workload.set_worksize(size);
       workload.setup_host();
 
       workload.setup_device(state.get_cuda_stream());
