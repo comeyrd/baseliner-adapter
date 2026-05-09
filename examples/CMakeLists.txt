@@ -17,7 +17,7 @@ if(ADAPTERS_HAS_CUDA)
     target_include_directories(matmul_nvbench PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
 endif()
 
-if(ADAPTERS_HAS_HIP)
+if(ADAPTERS_HAS_HIP OR ADAPTERS_HAS_CUDA)
     add_executable(matmul_primbench)
     target_link_libraries(matmul_primbench PRIVATE matmul baseliner_adapters::primbench )
     target_include_directories(matmul_primbench PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)

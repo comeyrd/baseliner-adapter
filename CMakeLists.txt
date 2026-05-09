@@ -53,7 +53,7 @@ if(ADAPTERS_HAS_CUDA)
     set(ADAPTERS_HAS_NVBENCH ON)
 endif()
 
-if(ADAPTERS_HAS_HIP)
+if(ADAPTERS_HAS_HIP OR ADAPTERS_HAS_CUDA)
     set(PRIMBENCH_INCLUDE_DIR "${CMAKE_BINARY_DIR}/_deps/primbench/include")
     file(MAKE_DIRECTORY ${PRIMBENCH_INCLUDE_DIR})
     FetchContent_Declare(
@@ -113,10 +113,29 @@ if(ADAPTERS_HAS_NVBENCH AND ADAPTERS_HAS_CUDA)
     target_sources(baseliner_adapters_nvbench INTERFACE $<TARGET_OBJECTS:nvbench::main>)
 endif()
 
-if(ADAPTERS_HAS_PRIMBENCH AND ADAPTERS_HAS_HIP)
-    add_library(baseliner_adapters_primbench STATIC
-        src/primbench/PrimBenchAdapter.hip
-    )
+if(ADAPTERS_HAS_PRIMBENCH AND (ADAPTERS_HAS_HIP OR ADAPTERS_HAS_CUDA))
+    if(ADAPTERS_HAS_HIP)
+        set(_primbench_default_backend HIP)
+    else()
+        set(_primbench_default_backend CUDA)
+    endif()
+    set(ADAPTERS_PRIMBENCH_BACKEND "${_primbench_default_backend}"
+        CACHE STRING "Backend for baseliner_adapters::primbench (HIP or CUDA)")
+
+    set(_primbench_src src/primbench/PrimBenchAdapter.cpp)
+
+    if(ADAPTERS_PRIMBENCH_BACKEND STREQUAL "HIP")
+        set_source_files_properties(${_primbench_src} PROPERTIES LANGUAGE HIP)
+        set(_primbench_backend_define BASELINER_BACKEND_HIP)
+    elseif(ADAPTERS_PRIMBENCH_BACKEND STREQUAL "CUDA")
+        set_source_files_properties(${_primbench_src} PROPERTIES LANGUAGE CUDA)
+        set(_primbench_backend_define BASELINER_BACKEND_CUDA)
+    else()
+        message(FATAL_ERROR
+            "ADAPTERS_PRIMBENCH_BACKEND must be HIP or CUDA, got '${ADAPTERS_PRIMBENCH_BACKEND}'")
+    endif()
+
+    add_library(baseliner_adapters_primbench STATIC ${_primbench_src})
     add_library(baseliner_adapters::primbench ALIAS baseliner_adapters_primbench)
 
     target_include_directories(baseliner_adapters_primbench
@@ -126,11 +145,20 @@ if(ADAPTERS_HAS_PRIMBENCH AND ADAPTERS_HAS_HIP)
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
             $<BUILD_INTERFACE:${PRIMBENCH_INCLUDE_DIR}>
     )
-    target_compile_definitions(baseliner_adapters_primbench PUBLIC ADAPTER_BACKEND_PRIMBENCH)
+
+    target_compile_definitions(baseliner_adapters_primbench PUBLIC
+        ADAPTER_BACKEND_PRIMBENCH
+        ${_primbench_backend_define}
+    )
     target_link_libraries(baseliner_adapters_primbench PUBLIC baseliner::core)
 
-    if(BASELINER_HAS_AMDSMI)
-        target_link_libraries(baseliner_adapters_primbench PUBLIC ADAPTER_AMD::amdsmi)
+    # AMD SMI only makes sense with HIP
+    if(ADAPTERS_PRIMBENCH_BACKEND STREQUAL "HIP")
+        if(BASELINER_HAS_AMDSMI)
+            target_link_libraries(baseliner_adapters_primbench PUBLIC ADAPTER_AMD::amdsmi)
+        else()
+            target_compile_definitions(baseliner_adapters_primbench PUBLIC PRIMBENCH_NO_MONITORING)
+        endif()
     else()
         target_compile_definitions(baseliner_adapters_primbench PUBLIC PRIMBENCH_NO_MONITORING)
     endif()

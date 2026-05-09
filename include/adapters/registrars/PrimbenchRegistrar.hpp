@@ -1,43 +1,39 @@
 #pragma once
-
 #include <baseliner/core/Workload.hpp>
-#include <baseliner/core/hardware/hip/HipBackend.hpp>
-
 #include <functional>
 #include <memory>
 #include <vector>
 
 namespace Adapters {
 
-  using HipWorkload = Baseliner::IWorkload<Baseliner::Hardware::HipBackend>;
-  using HipWorkloadFactory = std::function<std::unique_ptr<HipWorkload>()>;
-
+  template <class Backend>
   class PrimBenchStorage {
   public:
-    static auto instance() -> PrimBenchStorage & {
-      static PrimBenchStorage storage{};
-      return storage;
+    using Workload = Baseliner::IWorkload<Backend>;
+    using Factory = std::function<std::unique_ptr<Workload>()>;
+
+    static PrimBenchStorage &instance() {
+      static PrimBenchStorage s;
+      return s;
     }
 
-    void register_workload(HipWorkloadFactory factory) {
-      m_factories.push_back(std::move(factory));
+    void register_workload(Factory f) {
+      m_factories.push_back(std::move(f));
     }
-
-    auto take_workloads() -> std::vector<HipWorkloadFactory> {
-      std::vector<std::unique_ptr<HipWorkload>> workloads;
+    const std::vector<Factory> &factories() const {
       return m_factories;
     }
 
   private:
     PrimBenchStorage() = default;
-    std::vector<HipWorkloadFactory> m_factories;
+    std::vector<Factory> m_factories;
   };
 
-  template <typename WorkloadT>
+  template <class WorkloadT, class Backend>
   struct RegisterWorkload {
     RegisterWorkload() {
-      PrimBenchStorage::instance().register_workload(
-          []() -> std::unique_ptr<HipWorkload> { return std::make_unique<WorkloadT>(); });
+      PrimBenchStorage<Backend>::instance().register_workload(
+          []() -> std::unique_ptr<Baseliner::IWorkload<Backend>> { return std::make_unique<WorkloadT>(); });
     }
   };
 
